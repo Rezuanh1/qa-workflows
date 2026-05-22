@@ -1,1 +1,39 @@
+name: E-Commerce Automation Tests
 
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 9 * * *'  # প্রতিদিন সকাল ৯টায়
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Linux machine এ চলবে
+
+    steps:
+      - name: Code checkout করো
+        uses: actions/checkout@v3
+
+      - name: Python setup করো
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Dependencies install করো
+        run: pip install -r requirements.txt
+
+      - name: Chrome setup করো
+        uses: browser-actions/setup-chrome@latest
+
+      - name: Tests run করো
+        run: pytest tests/ -v --tb=short
+
+      - name: Test report upload করো
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-report
+          path: reports/
